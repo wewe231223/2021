@@ -66,10 +66,45 @@ BOOL InitInstance(HINSTANCE* GlobalHInstance,HINSTANCE hInstance,WCHAR* Winclass
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+bool init = FALSE;
+
+Point p1(0, 0);
+Point p2(100, 100);
+HDC hDc, memDc;
+PAINTSTRUCT ps;
+HBITMAP MyBitmap, OldBitmap;
+
+Entity Circle(IDB_BITMAP1, 1, &p1);
+Entity Square(IDB_BITMAP2, 2, &p2);
+
+std::vector<Entity*> EntityVec;
+
 LRESULT CALLBACK WndProc(HWND hWnd,UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
+// 이 함수 내에서의 지역 변수 선언 금지
+    if (!init) {
+        EntityVec.push_back(&Circle);
+        EntityVec.push_back(&Square);
+    }
+
+    switch (message){
+
+    case WM_KEYDOWN:
     {
+        if (wParam == VK_RIGHT) {
+            Circle.Position->x += 1;
+        }
+        else if (wParam == VK_DOWN) {
+            Circle.Position->y += 1;
+        }
+        else if (wParam == VK_LEFT) {
+            Circle.Position->x -= 1;
+        }
+        else if (wParam == VK_UP) {
+            Circle.Position->y -= 1;
+        }
+        InvalidateRgn(hWnd, NULL, TRUE);
+    }
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
@@ -89,9 +124,32 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_PAINT:
     {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+        
+        hDc = BeginPaint(hWnd, &ps);
+        memDc = CreateCompatibleDC(hDc);
+
+
+
+
+
+        MyBitmap = LoadBitmap(*GHInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+        OldBitmap = (HBITMAP)SelectObject(memDc, MyBitmap);
+        BitBlt(hDc, p1.x, p1.y, 400, 400, memDc, 0, 0, SRCCOPY);
+
+
+
+        MyBitmap = LoadBitmap(*GHInstance, MAKEINTRESOURCE(IDB_BITMAP2));
+        OldBitmap = (HBITMAP)SelectObject(memDc, MyBitmap);
+        BitBlt(hDc, p2.x, p2.y, 400, 400, memDc, 0, 0, SRCCOPY);
+
+
+
+
+
+
+
+        SelectObject(memDc, OldBitmap);
+        DeleteObject(MyBitmap);
         EndPaint(hWnd, &ps);
     }
     break;
