@@ -34,8 +34,7 @@ public:
 };
 
 class Entity {
-private:
-	int Priority;
+
 public:
 	int Code;
 	Point* Position;
@@ -45,26 +44,33 @@ public:
 	Entity() {}
 	~Entity() {}
 
-	Entity(int,int ,Point*);
+	Entity(int,Point*);
 
-	bool operator< (const Entity& other);
-	bool operator> (const Entity& other);
+
 };
-
-
-
 
 class DCManager {
 private:
+	//엔티티 출력 관련 벡터 
 	std::vector<Entity*>* EntVec;
 	std::vector<Entity*>::iterator iter;
+	
+	//더블버퍼링 관련 변수
+	PAINTSTRUCT ps;
+	
+	HDC BufferDC, CanvasDC;
+	HBITMAP BufferBitmap, EntityBitmap, OldBitmap;
 
 
 public:
-	DCManager(std::vector<Entity*>* EV);
+	
 	~DCManager() {}
 
-	HDC Paint(HWND);
-
-
+	void Resister(std::vector<Entity*>*);
+	HDC Paint(HWND,const HDC*,const HINSTANCE*,RECT*);
+	void Free();
 };
+
+
+void KnightAnimation(Entity* , bool* , int );
+bool ChangeState(Entity*, int);

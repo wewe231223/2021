@@ -1,5 +1,5 @@
 #include "API_Func.h"
-
+#pragma comment(lib, "msimg32.lib")
 
 HINSTANCE* GHInstance;
 
@@ -66,45 +66,72 @@ BOOL InitInstance(HINSTANCE* GlobalHInstance,HINSTANCE hInstance,WCHAR* Winclass
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
-bool init = FALSE;
-
 Point p1(0, 0);
 Point p2(100, 100);
-HDC hDc, memDc;
+Point p3(500, 500);
+
+Entity Knight(Knight1, &p3);
+Entity Circle(CIRCLE1, &p1);
+Entity Square(SQUARE1, &p2);
+
+
+
 PAINTSTRUCT ps;
-HBITMAP MyBitmap, OldBitmap;
+HDC hDc;
+RECT rect;
 
-Entity Circle(IDB_BITMAP1, 1, &p1);
-Entity Square(IDB_BITMAP2, 2, &p2);
 
+#define FPS 13
+#define TIMER_FPS 1
+#define TIMER_ANIMATION 2
+
+
+bool popup = FALSE;
+int KnightAni = 1;
 std::vector<Entity*> EntityVec;
+DCManager DM;
 
 LRESULT CALLBACK WndProc(HWND hWnd,UINT message, WPARAM wParam, LPARAM lParam)
 {
 // 이 함수 내에서의 지역 변수 선언 금지
-    if (!init) {
-        EntityVec.push_back(&Circle);
-        EntityVec.push_back(&Square);
-    }
+
 
     switch (message){
-
+    case WM_CREATE:
+        EntityVec.push_back(&Knight);
+        DM.Resister(&EntityVec);
+        SetTimer(hWnd, TIMER_FPS, FPS, NULL);
+        SetTimer(hWnd, TIMER_ANIMATION, 200, NULL);
+        break;
     case WM_KEYDOWN:
     {
+        KnightAni = 2;
         if (wParam == VK_RIGHT) {
-            Circle.Position->x += 1;
+            Knight.Position->x += 2;
         }
         else if (wParam == VK_DOWN) {
-            Circle.Position->y += 1;
+            Knight.Position->y += 2;
         }
         else if (wParam == VK_LEFT) {
-            Circle.Position->x -= 1;
+            Knight.Position->x -= 2;
         }
         else if (wParam == VK_UP) {
-            Circle.Position->y -= 1;
+            Knight.Position->y -= 2;
         }
-        InvalidateRgn(hWnd, NULL, TRUE);
+        break;
     }
+    case WM_KEYUP:
+        KnightAni = 1;
+        break;
+    case WM_TIMER:
+        if (wParam == TIMER_ANIMATION) {
+            KnightAnimation(&Knight, &popup, KnightAni);
+            
+        }
+
+        InvalidateRect(hWnd, NULL, FALSE);
+        UpdateWindow(hWnd);
+        break;
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
@@ -125,35 +152,22 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
     {
         
+
         hDc = BeginPaint(hWnd, &ps);
-        memDc = CreateCompatibleDC(hDc);
+        GetClientRect(hWnd, &rect);
 
 
+        BitBlt(hDc, 0, 0, rect.right, rect.bottom,DM.Paint(hWnd, &hDc, GHInstance, &rect), 0, 0, SRCCOPY);
 
+        DM.Free();
+        //free하는 과정은 객체 내 함수 생성
 
-
-        MyBitmap = LoadBitmap(*GHInstance, MAKEINTRESOURCE(IDB_BITMAP1));
-        OldBitmap = (HBITMAP)SelectObject(memDc, MyBitmap);
-        BitBlt(hDc, p1.x, p1.y, 400, 400, memDc, 0, 0, SRCCOPY);
-
-
-
-        MyBitmap = LoadBitmap(*GHInstance, MAKEINTRESOURCE(IDB_BITMAP2));
-        OldBitmap = (HBITMAP)SelectObject(memDc, MyBitmap);
-        BitBlt(hDc, p2.x, p2.y, 400, 400, memDc, 0, 0, SRCCOPY);
-
-
-
-
-
-
-
-        SelectObject(memDc, OldBitmap);
-        DeleteObject(MyBitmap);
         EndPaint(hWnd, &ps);
+
     }
     break;
     case WM_DESTROY:
+        KillTimer(hWnd, 1);
         PostQuitMessage(0);
         break;
     default:

@@ -50,9 +50,37 @@ END
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "bitmap1.bmp"
+CIRCLE1                 BITMAP                  "bitmap1.bmp"
 
-IDB_BITMAP2             BITMAP                  "bitmap2.bmp"
+SQUARE1                 BITMAP                  "bitmap2.bmp"
+
+CIRCLE2                 BITMAP                  "bitmap3.bmp"
+
+CIRCLE3                 BITMAP                  "bitmap4.bmp"
+
+Knight1                 BITMAP                  "bmp00001.bmp"
+
+Knight2                 BITMAP                  "bmp00002.bmp"
+
+Knight3                 BITMAP                  "bmp00003.bmp"
+
+Knight4                 BITMAP                  "bmp00004.bmp"
+
+WalkKnight1             BITMAP                  "bmp00005.bmp"
+
+WalkKnight2             BITMAP                  "bmp00006.bmp"
+
+WalkKnight3             BITMAP                  "bmp00007.bmp"
+
+WalkKnight4             BITMAP                  "bmp00008.bmp"
+
+WalkKnight5             BITMAP                  "bmp00009.bmp"
+
+WalkKnight6             BITMAP                  "bmp00010.bmp"
+
+WalkKnight7             BITMAP                  "bmp00011.bmp"
+
+WalkKnight8             BITMAP                  "bmp00012.bmp"
 
 #endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////
